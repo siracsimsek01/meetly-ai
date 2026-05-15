@@ -2,13 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  :root {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    color-scheme: dark;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    height: 100%;
+    background-color: #06090A;
+    color: #ECEFEF;
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: rgba(54, 240, 182, 0.35);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(54, 240, 182, 0.35);
+  }
 }
 
-/* ======== stream css overrides ======== */
+@layer components {
+  .surface-panel {
+    @apply rounded-3xl border border-white/5 bg-ink-850/80 backdrop-blur-xl;
+    box-shadow: 0 30px 80px -50px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  }
+
+  .surface-card {
+    @apply rounded-2xl border border-white/5 bg-ink-800/80 backdrop-blur-md;
+    box-shadow: 0 20px 60px -40px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  }
+
+  .surface-soft {
+    @apply rounded-2xl border border-white/[0.04] bg-white/[0.02];
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-muted-soft;
+  }
+
+  .pill-active {
+    @apply border-mint-400/40 bg-mint-400/15 text-mint-300;
+  }
+
+  .icon-btn {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/5 bg-white/[0.03] text-muted-soft transition hover:bg-white/[0.07] hover:text-white;
+  }
+
+  .icon-btn-mint {
+    @apply text-mint-300 hover:bg-mint-400/15 hover:text-mint-200;
+  }
+
+  .control-btn {
+    @apply inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/5 bg-white/[0.04] text-white transition hover:bg-white/[0.08];
+  }
+
+  .control-btn-danger {
+    @apply h-14 w-16 rounded-full border-none bg-coral-500 text-white shadow-[0_15px_40px_-10px_rgba(255,83,64,0.65)] hover:bg-coral-400;
+  }
+
+  .grid-tile {
+    @apply relative overflow-hidden rounded-3xl border border-white/5 bg-ink-800;
+  }
+
+  .grid-tile-active {
+    @apply border-mint-400/70 shadow-[0_0_0_2px_rgba(54,240,182,0.35),0_30px_60px_-30px_rgba(54,240,182,0.4)];
+  }
+
+  .checklist-item {
+    @apply flex items-center gap-3 rounded-full border border-white/5 bg-white/[0.02] px-3 py-2 text-sm text-muted-soft transition hover:border-white/10;
+  }
+
+  .checklist-item-done {
+    @apply text-muted line-through;
+  }
+}
+
+@layer utilities {
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .mask-fade-y {
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  }
+}
+
+/* ============================================================
+   Stream Video SDK overrides — match new dark/mint design
+   ============================================================ */
+.str-video,
+.str-video__call,
+.str-video__call-controls,
+.str-video__participant-view,
+.str-video__paginated-grid-layout {
+  background: transparent !important;
+}
+
 .str-video__call-stats {
   max-width: 500px;
   position: relative;
@@ -18,103 +140,266 @@
   max-height: 700px;
 }
 
-.str-video__participant-details {
-  color: white;
-}
-
-.str-video__menu-container {
-  color: white;
-}
-
+.str-video__participant-details,
+.str-video__menu-container,
 .str-video__notification {
   color: white;
 }
 
+/* The bottom-of-tile name + mic pill — keep it inside the rounded tile and
+ * never let the name truncate awkwardly off-screen. */
+.str-video__participant-details {
+  position: absolute !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  width: fit-content !important;
+  max-width: calc(100% - 24px) !important;
+  padding: 6px 10px !important;
+  border-radius: 999px !important;
+  background: rgba(6, 9, 10, 0.7) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+.str-video__participant-details .str-video__participant-details__name {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  max-width: 220px !important;
+}
+
 .str-video__participant-list {
-  background-color: #1c1f2e;
-  padding: 10px;
-  border-radius: 10px;
+  background-color: rgba(14, 20, 22, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+  padding: 16px;
+  border-radius: 24px;
   color: white;
   height: 100%;
 }
 
 .str-video__call-controls__button {
-  height: 40px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  transition: all 0.15s ease;
 }
 
-.glassmorphism {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-.glassmorphism2 {
-  background: rgba(18, 17, 17, 0.25);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+.str-video__call-controls__button:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* ==== clerk class override ===== */
+.str-video__participant-view {
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
 
+.str-video__participant-view--speaking {
+  border-color: rgba(54, 240, 182, 0.6) !important;
+  box-shadow: 0 0 0 2px rgba(54, 240, 182, 0.4),
+    0 30px 60px -30px rgba(54, 240, 182, 0.35) !important;
+}
+
+/* ============================================================
+   Clerk overrides
+   ============================================================ */
 .cl-providerIcon__github {
   filter: invert(1);
 }
 
-.cl-userButtonPopoverActionButtonIcon {
+.cl-userButtonPopoverActionButtonIcon,
+.cl-userButtonPopoverActionButton,
+.cl-internal-wkkub3,
+.cl-internal-17jzs7d {
   color: white;
 }
 
 .cl-logoBox {
   height: 40px;
 }
+
 .cl-dividerLine {
-  background: #252a41;
-  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  height: 1px;
 }
 
 .cl-socialButtonsIconButton {
-  border: 3px solid #565761;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
 }
 
-.cl-internal-wkkub3 {
-  color: white;
-}
-.cl-userButtonPopoverActionButton {
-  color: white;
-}
-
-/* =============================== */
-
-@layer utilities {
-  .flex-center {
-    @apply flex justify-center items-center;
-  }
-
-  .flex-between {
-    @apply flex justify-between items-center;
-  }
+.cl-card {
+  background: rgba(14, 20, 22, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.75) !important;
+  border-radius: 24px !important;
+  backdrop-filter: blur(20px);
 }
 
-/* animation */
+.cl-formButtonPrimary {
+  background: #36F0B6 !important;
+  color: #06090A !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  border-radius: 999px !important;
+  height: 42px !important;
+}
 
+.cl-formButtonPrimary:hover {
+  background: #5FFCC8 !important;
+}
+
+.cl-formFieldInput {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 14px !important;
+  color: #fff !important;
+}
+
+.cl-formFieldInput:focus {
+  border-color: rgba(54, 240, 182, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(54, 240, 182, 0.15) !important;
+}
+
+/* Hide the "Secured by Clerk" footer + development banner */
+.cl-footer,
+.cl-internal-b3fm6y,
+.cl-internalBranding,
+.cl-poweredByClerkText,
+[data-localization-key='footerPoweredByText'],
+[class*='cl-internal'][class*='Branding'],
+.cl-badge,
+.cl-development-mode {
+  display: none !important;
+}
+
+/* "Continue with Google" + other block social buttons → solid white */
+.cl-socialButtonsBlockButton,
+.cl-socialButtonsBlockButton__google,
+.cl-socialButtonsBlockButton__github,
+.cl-socialButtonsBlockButton__linkedin_oidc,
+.cl-socialButtonsBlockButton__microsoft,
+.cl-socialButtonsBlockButton__apple {
+  background: #ffffff !important;
+  color: #06090A !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  font-weight: 600 !important;
+  border-radius: 999px !important;
+  height: 44px !important;
+  transition: background 0.15s ease, transform 0.15s ease !important;
+}
+
+.cl-socialButtonsBlockButton:hover,
+.cl-socialButtonsBlockButton__google:hover,
+.cl-socialButtonsBlockButton__github:hover,
+.cl-socialButtonsBlockButton__linkedin_oidc:hover {
+  background: #f4f6f7 !important;
+  transform: translateY(-1px);
+}
+
+.cl-socialButtonsBlockButton .cl-socialButtonsBlockButtonText,
+.cl-socialButtonsBlockButtonText {
+  color: #06090A !important;
+  font-weight: 600 !important;
+}
+
+/* Provider icon stays in original color — strip any inverted filters */
+.cl-socialButtonsBlockButton .cl-socialButtonsProviderIcon,
+.cl-socialButtonsBlockButton img {
+  filter: none !important;
+}
+
+/* "Last used" pill alignment so it sits cleanly above the white button */
+.cl-socialButtonsBlockButton__google .cl-badge,
+.cl-socialButtons .cl-badge {
+  display: inline-flex !important;
+  color: #A6B0B3 !important;
+  background: transparent !important;
+}
+
+/* ============================================================
+   Datepicker overrides
+   ============================================================ */
+.react-datepicker__input-container input {
+  background: transparent;
+  color: #fff;
+}
+
+.react-datepicker {
+  background: #0E1416 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 16px !important;
+  font-family: inherit !important;
+  color: #fff !important;
+}
+
+.react-datepicker__header {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #fff !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker-time__header,
+.react-datepicker__day {
+  color: #fff !important;
+}
+
+.react-datepicker__day:hover {
+  background: rgba(54, 240, 182, 0.15) !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: #36F0B6 !important;
+  color: #06090A !important;
+  border-radius: 8px !important;
+}
+
+.react-datepicker__time-container {
+  border-left: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.react-datepicker__time {
+  background: transparent !important;
+}
+
+.react-datepicker__time-list-item {
+  color: #fff !important;
+}
+
+.react-datepicker__time-list-item--selected {
+  background: #36F0B6 !important;
+  color: #06090A !important;
+}
+
+/* ============================================================
+   Show-block reveal animation
+   ============================================================ */
 .show-block {
   width: 100%;
-  max-width: 350px;
+  max-width: 360px;
   display: block;
-  animation: show 0.7s forwards linear;
+  animation: showReveal 0.5s forwards cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes show {
+@keyframes showReveal {
   0% {
-    animation-timing-function: ease-in;
     width: 0%;
+    opacity: 0;
   }
-
   100% {
-    animation-timing-function: ease-in;
     width: 100%;
+    opacity: 1;
   }
-}
-
-.cl-internal-17jzs7d {
-  color: #fff;
 }

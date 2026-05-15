@@ -1,18 +1,20 @@
-import CallList from '@/components/CallList'
-import React from 'react'
+import { History } from 'lucide-react';
+
+import CallList from '@/components/CallList';
+import PageHeader from '@/components/PageHeader';
 
 const Previous = () => {
   return (
-    <section className='flex size-full flex-col gap-10 text-white'>
-      <h1 className='text-3xl font-bold'>
-      Previous
-      </h1>
-
+    <section className="flex flex-col gap-8 pt-2 text-white">
+      <PageHeader
+        icon={History}
+        eyebrow="History"
+        title="Previous meetings"
+        description="A quiet archive of the conversations you have already had."
+      />
       <CallList type="ended" />
+    </section>
+  );
+};
 
-      
-   </section>
-  )
-}
-
-export default Previous
+export default Previous;

@@ -1,19 +1,49 @@
 'use client';
 
+import { useStreamVideoClient } from '@stream-io/video-react-sdk';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import { Copy, Sparkles, UserSquare2, Video } from 'lucide-react';
+
+import PageHeader from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useGetCallById } from '@/hooks/useGetCallById';
-import { useUser } from '@clerk/nextjs'
-import { useStreamVideoClient } from '@stream-io/video-react-sdk';
-import { useRouter } from 'next/navigation';
-import React from 'react'
+import { meetingLink } from '@/lib/url';
 
-const Table = ({ title, description }: { title: string; description: string; }) => (
-  <div className='flex flex-col items-start gap-2 xl:flex-row'>
-    <h1 className='text-base font-medium text-sky-1 lg:text-xl xl:min-w-32'>{title}:</h1>
-    <h1 className='truncate text-sm font-bold max-sm:max-w-[320px] lg:text-xl'>{description}</h1>
-  </div>
-)
+const Row = ({
+  label,
+  value,
+  copyable,
+}: {
+  label: string;
+  value: string;
+  copyable?: boolean;
+}) => {
+  const { toast } = useToast();
+  return (
+    <div className="flex flex-col gap-2 rounded-2xl border border-white/5 bg-white/[0.02] p-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col">
+        <span className="text-xs uppercase tracking-[0.25em] text-muted">
+          {label}
+        </span>
+        <span className="mt-1 text-base font-medium text-white">{value}</span>
+      </div>
+      {copyable && (
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(value);
+            toast({ title: 'Copied to clipboard' });
+          }}
+          className="inline-flex items-center gap-2 self-start rounded-full border border-white/5 bg-white/[0.04] px-4 py-2 text-xs text-muted-soft transition hover:bg-white/[0.08] hover:text-white"
+        >
+          <Copy className="h-3.5 w-3.5" />
+          Copy
+        </button>
+      )}
+    </div>
+  );
+};
 
 const PersonalRoom = () => {
   const { user } = useUser();
@@ -22,8 +52,9 @@ const PersonalRoom = () => {
   const client = useStreamVideoClient();
   const router = useRouter();
 
-  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}?personal=true`;
-
+  const inviteLink = meetingId
+    ? meetingLink(meetingId, { personal: true })
+    : '';
   const { call } = useGetCallById(meetingId!);
 
   const startRoom = async () => {
@@ -34,42 +65,52 @@ const PersonalRoom = () => {
       await newCall.getOrCreate({
         data: {
           starts_at: new Date().toISOString(),
-        }
-      })
+        },
+      });
     }
 
-    router.push(`/meeting/${meetingId}?personal=true`)
-  }
-
-
+    router.push(`/meeting/${meetingId}?personal=true`);
+  };
 
   return (
-    <section className='flex size-full flex-col gap-10 text-white'>
-      <h1 className='text-3xl font-bold'>
-        Personal Room
-      </h1>
+    <section className="flex flex-col gap-8 pt-2 text-white">
+      <PageHeader
+        icon={UserSquare2}
+        eyebrow="Always-on"
+        title="Personal room"
+        description="Your dedicated space. Same link forever — share it with whoever, whenever."
+      />
 
-      <div className='flex w-full flex-col gap-8 xl:max-w-[900px]'>
-        <Table title="Topic" description={`${user?.username}'s meeting room`} />
-        <Table title="Meeting ID" description={meetingId!} />
-        <Table title="Invite Link" description={meetingLink} />
-      </div>
-      <div className='flex gap-5'>
-        <Button className='bg-blue-1' onClick={startRoom}>
-          Start Meeting
-        </Button>
-        <Button className='bg-dark-3' onClick={() => {
-          navigator.clipboard.writeText(meetingLink);
-          toast({
-            title: 'Link copied to clipboard'
-          });
-        }}>
-          Copy Invitation
-        </Button>
+      <div className="grid gap-3 md:grid-cols-2">
+        <Row
+          label="Topic"
+          value={`${user?.username || user?.firstName || 'You'}'s meeting room`}
+        />
+        <Row label="Meeting ID" value={meetingId ?? '—'} copyable />
+        <div className="md:col-span-2">
+          <Row label="Invite link" value={inviteLink} copyable />
+        </div>
       </div>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          onClick={startRoom}
+          className="h-12 gap-2 rounded-full bg-mint-400 px-6 text-sm font-semibold text-ink-950 hover:bg-mint-300"
+        >
+          <Video className="h-4 w-4" /> Start meeting
+        </Button>
+        <Button
+          onClick={() => {
+            navigator.clipboard.writeText(inviteLink);
+            toast({ title: 'Invite link copied' });
+          }}
+          className="h-12 gap-2 rounded-full border border-white/5 bg-white/[0.04] px-6 text-sm text-white hover:bg-white/[0.07]"
+        >
+          <Sparkles className="h-4 w-4" /> Copy invite
+        </Button>
+      </div>
     </section>
-  )
-}
+  );
+};
 
-export default PersonalRoom
+export default PersonalRoom;

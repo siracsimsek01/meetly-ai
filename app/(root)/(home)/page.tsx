@@ -1,31 +1,98 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import MeetingTypeList from '@/components/MeetingTypeList';
-import { useUser } from '@clerk/nextjs';
-import { Client } from '@clerk/nextjs/server';
-// import { useEffect, useState } from 'react';
+import HeroPanel from '@/components/dashboard/HeroPanel';
+import QuickActionsRow from '@/components/dashboard/QuickActionsRow';
+import TodaysAgenda from '@/components/dashboard/TodaysAgenda';
+import MiniCalendar from '@/components/dashboard/MiniCalendar';
+import StatsKpis from '@/components/dashboard/StatsKpis';
+import RecentRecordingsStrip from '@/components/dashboard/RecentRecordingsStrip';
+import ActivityFeed from '@/components/dashboard/ActivityFeed';
+import TeamPresence from '@/components/dashboard/TeamPresence';
+import AiAssistantPanel from '@/components/dashboard/AiAssistantPanel';
+import {
+  HeroSkeleton,
+  KpisSkeleton,
+  QuickActionsSkeleton,
+} from '@/components/dashboard/DashboardSkeleton';
+import { useGetCalls } from '@/hooks/useGetCalls';
+import { mergeAgenda } from '@/lib/mock/agenda';
+import { team } from '@/lib/mock/team';
 
 const Home = () => {
-  const now = new Date();
-  const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  const date = (new Intl.DateTimeFormat('en-US', { dateStyle: 'full' })).format(now);
+  const { upcomingCalls, isLoading } = useGetCalls();
+  const agenda = useMemo(() => mergeAgenda(upcomingCalls), [upcomingCalls]);
+  const teammatesOnline = useMemo(
+    () => team.filter((t) => t.status === 'online').length,
+    [],
+  );
 
+  const nextMeeting = agenda[0];
+  const totalToday = agenda.filter((m) => {
+    const today = new Date();
+    return (
+      m.start.getDate() === today.getDate() &&
+      m.start.getMonth() === today.getMonth() &&
+      m.start.getFullYear() === today.getFullYear()
+    );
+  }).length;
 
   return (
-    <section className="flex size-full flex-col gap-5 text-white">
-      <div className="h-[303px] w-full rounded-[20px] bg-hero bg-cover">
-        <div className="flex h-full flex-col px-5 py-8 justify-end  lg:p-11">
-          {/* <h2 className="glassmorphism max-w-[273px] rounded py-2 text-center text-base font-normal">
-            Upcoming Meeting at: 12:30 PM
-          </h2> */}
-          <div className="flex flex-col gap-2">
-            <h1 className="text-4xl font-extrabold lg:text-7xl">{time}</h1>
-            <p className="text-lg font-medium text-sky-1 lg:text-2xl">{date}</p>
+    <section className="flex flex-col gap-6 pb-10 text-white">
+      {isLoading ? (
+        <HeroSkeleton />
+      ) : (
+        <HeroPanel
+          nextMeeting={nextMeeting}
+          totalToday={totalToday}
+          teammatesOnline={teammatesOnline}
+        />
+      )}
+
+      <div className="flex flex-col gap-3">
+        <div className="flex items-end justify-between">
+          <div>
+            <h2 className="font-display text-xl font-semibold text-white">
+              Quick actions
+            </h2>
+            <p className="text-xs text-muted-soft">
+              The fastest ways back into a room.
+            </p>
           </div>
         </div>
+        {isLoading ? <QuickActionsSkeleton /> : <QuickActionsRow />}
       </div>
 
-      <MeetingTypeList />
+      <div className="flex flex-col gap-3">
+        <div className="flex items-end justify-between">
+          <div>
+            <h2 className="font-display text-xl font-semibold text-white">
+              Start something
+            </h2>
+            <p className="text-xs text-muted-soft">
+              Four ways to begin. Pick the one that fits your moment.
+            </p>
+          </div>
+        </div>
+        <MeetingTypeList />
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
+        <div className="flex flex-col gap-5 xl:col-span-8">
+          <TodaysAgenda />
+          {isLoading ? <KpisSkeleton /> : <StatsKpis />}
+          <RecentRecordingsStrip />
+          <ActivityFeed />
+        </div>
+
+        <aside className="flex flex-col gap-5 xl:col-span-4">
+          <MiniCalendar />
+          <TeamPresence />
+          <AiAssistantPanel />
+        </aside>
+      </div>
     </section>
   );
 };

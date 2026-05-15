@@ -1,69 +1,73 @@
-"use client";
+'use client';
 
-import { ReactNode } from "react";
-import { Dialog, DialogContent } from "./ui/dialog";
-import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
-import Image from "next/image";
+import { ReactNode } from 'react';
+import { type LucideIcon } from 'lucide-react';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from './ui/dialog';
+import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 
 interface MeetingModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  subtitle?: string;
   className?: string;
   children?: ReactNode;
   handleClick?: () => void;
   buttonText?: string;
-  instantMeeting?: boolean;
-  image?: string;
-  buttonClassName?: string;
-  buttonIcon?: string;
+  icon?: LucideIcon;
 }
 
 const MeetingModal = ({
   isOpen,
   onClose,
   title,
+  subtitle,
   className,
   children,
   handleClick,
   buttonText,
-  instantMeeting,
-  image,
-  buttonClassName,
-  buttonIcon,
+  icon: Icon,
 }: MeetingModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="flex w-full max-w-[520px] flex-col gap-6 border-none bg-dark-1 px-6 py-9 text-white">
-        <div className="flex flex-col gap-6">
-          {image && (
-            <div className="flex justify-center">
-              <Image src={image} alt="checked" width={72} height={72} />
-            </div>
+      <DialogContent className="flex w-full max-w-[520px] flex-col gap-6 rounded-3xl border border-white/5 bg-ink-850/95 p-8 text-white backdrop-blur-2xl">
+        <div className="flex items-start gap-4">
+          {Icon && (
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-mint-400/15 text-mint-300">
+              <Icon className="h-5 w-5" strokeWidth={2.2} />
+            </span>
           )}
-          <h1 className={cn("text-3xl font-bold leading-[42px]", className)}>
-            {title}
-          </h1>
-          {children}
-          <Button
-            className={
-              "bg-blue-1 focus-visible:ring-0 focus-visible:ring-offset-0"
-            }
-            onClick={handleClick}
-          >
-            {buttonIcon && (
-              <Image
-                src={buttonIcon}
-                alt="button icon"
-                width={13}
-                height={13}
-              />
-            )}{" "}
-            &nbsp;
-            {buttonText || "Schedule Meeting"}
-          </Button>
+          <div className={cn('space-y-1.5', className)}>
+            <DialogTitle className="font-display text-2xl font-semibold leading-tight">
+              {title}
+            </DialogTitle>
+            {subtitle ? (
+              <DialogDescription className="text-sm text-muted-soft">
+                {subtitle}
+              </DialogDescription>
+            ) : (
+              <DialogDescription className="sr-only">
+                {title}
+              </DialogDescription>
+            )}
+          </div>
         </div>
+
+        {children && <div className="flex flex-col gap-5">{children}</div>}
+
+        <Button
+          onClick={handleClick}
+          className="h-12 w-full rounded-full bg-mint-400 text-base font-semibold text-ink-950 transition hover:bg-mint-300"
+        >
+          {buttonText || 'Confirm'}
+        </Button>
       </DialogContent>
     </Dialog>
   );

@@ -1,23 +1,31 @@
-import StreamVideoProvider from '@/providers/StreamClientProvider'
 import { Metadata } from 'next';
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react';
+
+import StreamVideoProvider from '@/providers/StreamClientProvider';
+import { MeetingActionsProvider } from '@/providers/MeetingActionsProvider';
+import { MeetingsDataProvider } from '@/providers/MeetingsDataProvider';
+import { CommandPaletteProvider } from '@/providers/CommandPaletteProvider';
 
 export const metadata: Metadata = {
-  title: "Zoom",
-  description: "Video conferencing with Zoom",
+  title: 'Meetly AI',
+  description: 'Video meetings, calmer.',
   icons: {
-    icon: '/icons/logo.svg'
-  }
+    icon: '/images/logo.svg',
+  },
 };
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <main>
       <StreamVideoProvider>
-        {children}
+        <MeetingsDataProvider>
+          <MeetingActionsProvider>
+            <CommandPaletteProvider>{children}</CommandPaletteProvider>
+          </MeetingActionsProvider>
+        </MeetingsDataProvider>
       </StreamVideoProvider>
     </main>
-  )
-}
+  );
+};
 
-export default RootLayout
+export default RootLayout;

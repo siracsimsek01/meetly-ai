@@ -1,45 +1,49 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import {
-    StreamVideo,
-    StreamVideoClient,
+  StreamVideo,
+  StreamVideoClient,
 } from '@stream-io/video-react-sdk';
-import { useEffect, useState } from 'react';
-import { tokenProvider } from '@/actions/stream.actions';
+
 import Loader from '@/components/Loader';
+import { tokenProvider } from '@/actions/stream.actions';
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY;
 
-
 const StreamVideoProvider = ({ children }: { children: React.ReactNode }) => {
-    const [videoClient, setvideoClient] = useState<StreamVideoClient>();
-    const { user, isLoaded } = useUser();
+  const { user, isLoaded } = useUser();
+  const [videoClient, setVideoClient] = useState<StreamVideoClient | null>(null);
 
-    useEffect(() => {
-        if(!isLoaded || !user) return;
-        if(!apiKey) throw new Error('Stream API key is missing');
+  useEffect(() => {
+    if (!isLoaded || !user) return;
+    if (!apiKey) throw new Error('Stream API key is missing');
 
-        const client = new StreamVideoClient({
-            apiKey,
-            user: {
-                id: user?.id,
-                name: user?.username || user?.id,
-                image: user?.imageUrl,
-            },
-            tokenProvider,
-        })
+    // Constructing the Stream client kicks off `connectUser`, which calls
+    // a Next.js server action via our `tokenProvider`. That transition must
+    // not happen during render — keep it inside the effect.
+    const client = new StreamVideoClient({
+      apiKey,
+      user: {
+        id: user.id,
+        name: user.username || user.id,
+        image: user.imageUrl,
+      },
+      tokenProvider,
+    });
 
-        setvideoClient(client);
-    }, [user, isLoaded])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setVideoClient(client);
 
-    if(!videoClient) return <Loader />;
+    return () => {
+      client.disconnectUser();
+    };
+  }, [isLoaded, user]);
 
-    return (
-        <StreamVideo client={videoClient}>
-            {children}
-        </StreamVideo>
-    );
+  if (!videoClient) return <Loader />;
+
+  return <StreamVideo client={videoClient}>{children}</StreamVideo>;
 };
 
-export default StreamVideoProvider
+export default StreamVideoProvider;
