@@ -113,7 +113,3 @@ Get keys from:
 - Stream — <https://getstream.io/dashboard>
 - Clerk — <https://dashboard.clerk.com>
 - Claude — <https://console.anthropic.com/settings/keys>
-
----
-
-Built with care · Powered by Claude.
