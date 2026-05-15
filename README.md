@@ -1,4 +1,9 @@
-<div align="left">
+<div align="center">
+  <br />
+
+  <img src="./public/images/cover.webp" alt="Meetly AI — pre-flight check" width="100%" />
+
+  <br />
   <br />
 
   <div>
